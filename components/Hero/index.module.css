@@ -1,0 +1,45 @@
+.heroContainer {
+  max-width: 90rem;
+  padding-left: max(env(safe-area-inset-left),1.5rem);
+  padding-right: max(env(safe-area-inset-right),1.5rem);
+  margin: 0 auto 3rem;
+}
+
+.heroName {
+  font-size: 3.125rem;
+  font-size: min(4.375rem, max(8vw, 2.5rem));
+  font-weight: 700;
+  font-feature-settings: initial;
+  letter-spacing: -.12rem;
+  margin-left: -0.2rem;
+  margin-top: 3.4rem;
+  line-height: 1.1;
+  background-image: linear-gradient(146deg,#000,#757a7d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroText {
+  font-size: 1.3rem;
+  font-size: min(1.3rem, max(3.5vw, 1.2rem));
+  font-feature-settings: initial;
+  line-height: 1.6;
+  margin-top: 0 !important;
+  color: rgba(60, 60, 67, .7);
+}
+
+.heroTagline {
+  font-size: 2.125rem;
+  font-size: min(2.375rem, max(6vw, 1.5rem));
+  font-weight: 700;
+  font-feature-settings: initial;
+  letter-spacing: -.12rem;
+  margin-left: -0.2rem;
+  margin-top: 0.5rem !important;
+  line-height: 1.1;
+  background-image: linear-gradient(146deg,#333,#878a8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

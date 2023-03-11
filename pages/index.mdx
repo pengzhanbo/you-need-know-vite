@@ -1,0 +1,25 @@
+---
+title: You-Need-Know-Vite
+---
+import { Hero } from '@components/Hero'
+import { Actions, Action } from '@components/HeroActions'
+import { Features, Feature } from '@components/Features'
+
+<div className="home-content">
+  <Hero
+    name="You-Need-Know-Vite"
+    tagline="你需要知道的Vite"
+    text="使用建议 & 插件机制 & 插件开发 & 剖析Vite源码，深入了解Vite运作原理。"
+  />
+  <Actions>
+    <Action text="Get Started" link="/guide" type="brand" />
+    <Action text="Todo..." type="alt" />
+  </Actions>
+
+  <Features>
+    <Feature icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18h5.5q.425 0 .788-.212q.362-.213.512-.588l2.1-4.9q.05-.125.075-.25q.025-.125.025-.25V11q0-.425-.288-.713Q17.425 10 17 10h-4.6l.6-3.4q.05-.25-.025-.475q-.075-.225-.25-.4L12 5l-4.6 5q-.2.2-.3.45q-.1.25-.1.55v5q0 .825.588 1.413Q8.175 18 9 18Zm3 4q-2.075 0-3.9-.788q-1.825-.787-3.175-2.137q-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175q1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138q1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175q-1.35 1.35-3.175 2.137Q14.075 22 12 22Z"/></svg>} title="使用建议" details="配置 & 优化 & 插件推荐" />
+    <Feature icon={<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M1 8a7 7 0 1 1 2.898 5.673c-.167-.121-.216-.406-.002-.62l1.8-1.8a3.5 3.5 0 0 0 4.572-.328l1.414-1.415a.5.5 0 0 0 0-.707l-.707-.707l1.559-1.563a.5.5 0 1 0-.708-.706l-1.559 1.562l-1.414-1.414l1.56-1.562a.5.5 0 1 0-.707-.706l-1.56 1.56l-.707-.706a.5.5 0 0 0-.707 0L5.318 5.975a3.5 3.5 0 0 0-.328 4.571l-1.8 1.8c-.58.58-.62 1.6.121 2.137A8 8 0 1 0 0 8a.5.5 0 0 0 1 0Z"/></svg>} title="插件机制" details="解析vite 插件运行机制" />
+    <Feature icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.413-.587Q3 19.825 3 19v-4h2v4h4v2Zm10 0v-2h4v-4h2v4q0 .825-.587 1.413Q19.825 21 19 21Zm-6.4-5.4L5 12l3.6-3.6L10 9.825L7.825 12L10 14.175Zm6.8 0L14 14.175L16.175 12L14 9.825L15.4 8.4L19 12ZM3 9V5q0-.825.587-1.413Q4.175 3 5 3h4v2H5v4Zm16 0V5h-4V3h4q.825 0 1.413.587Q21 4.175 21 5v4Z"/></svg>} title="源码解析" details="深入解析Vite源码" />
+  </Features>
+</div>
+

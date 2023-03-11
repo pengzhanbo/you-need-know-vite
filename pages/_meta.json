@@ -1,0 +1,25 @@
+{
+  "index": {
+    "type": "page",
+    "title": "Home",
+    "display": "hidden",
+    "theme": {
+      "layout": "raw"
+    }
+  },
+  "sources": {
+    "type": "page",
+    "title": "源码解析"
+  },
+  "guide": {
+    "type": "page",
+    "title": "使用建议"
+  },
+  "about": {
+    "title": "About",
+    "type": "page",
+    "theme": {
+      "typesetting": "article"
+    }
+  }
+}
