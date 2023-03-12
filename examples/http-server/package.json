@@ -1,0 +1,9 @@
+{
+  "name": "example-http-server",
+  "version": "0.0.0",
+  "author": "pengzhanbo",
+  "type": "module",
+  "scripts": {
+    "start": "ts-node-esm index.ts"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "example-connect",
+  "type": "module",
+  "scripts": {
+    "start": "ts-node-esm index.ts"
+  },
+  "dependencies": {
+    "connect": "^3.7.0"
+  },
+  "devDependencies": {
+    "@types/connect": "^3.4.35"
+  }
+}

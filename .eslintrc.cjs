@@ -52,7 +52,7 @@ module.exports = {
     },
     // Rules for React files
     {
-      files: "**",
+      files: "docs/**",
       extends: [
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
@@ -100,7 +100,8 @@ module.exports = {
       ],
       parserOptions: {
         project: [
-          "tsconfig.json",
+          "examples/*/tsconfig.json",
+          "docs/tsconfig.json",
         ],
       },
       rules: {
@@ -108,26 +109,17 @@ module.exports = {
         "@typescript-eslint/consistent-type-imports": "error",
       },
     },
+    // ⚙️ Docs
     {
       ...TAILWIND_CONFIG,
-      files: "**",
-      plugins: ["typescript-sort-keys"],
+      files: "docs/**",
       settings: {
         tailwindcss: {
-          config: "tailwind.config.js",
+          config: "docs/tailwind.config.js",
           callees: ["cn"],
-          whitelist: ["nextra-breadcrumb", "nextra-callout", "nextra-bleed"],
+          whitelist: ["dash-ring", "theme-1", "theme-2", "theme-3", "theme-4"],
         },
-      },
-      rules: {
-        ...TAILWIND_CONFIG.rules,
-        // "no-restricted-imports": [
-        //   "error",
-        //   {
-        //     name: "next/link",
-        //     message: "Use local <Anchor /> instead",
-        //   },
-        // ],
+        next: { rootDir: "docs" },
       },
     },
     {
@@ -140,13 +132,6 @@ module.exports = {
       ],
       env: {
         node: true,
-      },
-    },
-    {
-      files: "**",
-      rules: {
-        // disable rule because we don't have pagesDir in above folders
-        "@next/next/no-html-link-for-pages": "off",
       },
     },
     {
