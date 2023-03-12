@@ -13,6 +13,8 @@ title: 简化版 Vite
 
 ## 开发服务
 
+### http-server
+
 在 node 中，实现一个 开发服务 很简单，可以通过内置的 `http` 模块，实现一个 `http` 服务：
 
 ```ts
@@ -53,9 +55,11 @@ const server = createServer(async (req, res) => {
   stream.pipe(res);
 });
 
-server.listen(3000);
+server.listen(3001);
 
 ```
+
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/http-server)
 
 可以预见的是，我们可能需要预先对各种资源在 `http server` 中进行处理，同时还要使 `http server` 保证可用，并实现
 其他各种相关功能。
@@ -67,6 +71,8 @@ server.listen(3000);
 
 > 在 `vite` 的 `2.0` 版本之前，选择的是 `koa` 作为 `http-server`。 为什么从 `koa` 切换到 `connect`，原因我还未做深入了解。
 
+### Connect
+
 使用 `connect` 启动一个 `http-server` 非常简单：
 
 ```ts
@@ -76,3 +82,29 @@ const server = connect()
 
 server.listen(3000)
 ```
+
+在此基础上，我们可以实现一个简单的 `Web http server`:
+
+```ts
+import connect from "connect";
+import fs, { promises as fsp } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const server = connect()
+
+server.use(async (req, res) => {
+  const url = req.url === '/' ? '/index.html' : req.url
+  const assert = path.join(dirname, `./template/${url}`);
+  const stream = fs.createReadStream(assert);
+  stream.pipe(res);
+})
+
+server.listen(3001)
+
+```
+
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/connect)
+
