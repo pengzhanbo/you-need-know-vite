@@ -13,4 +13,6 @@ const server = createServer(async (req, res) => {
   stream.pipe(res);
 });
 
-server.listen(3001);
+server.listen(3001, () => {
+  console.log('server listen: http://localhost:3001');
+});

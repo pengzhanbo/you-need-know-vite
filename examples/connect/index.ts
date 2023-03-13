@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const server = connect()
+const server = connect();
 
 server.use(async (req, res) => {
   const url = req.url === '/' ? '/index.html' : req.url
@@ -16,8 +16,10 @@ server.use(async (req, res) => {
     res.setHeader("Content-Length", stats.size);
     stream.pipe(res);
   } else {
-    res.end()
+    res.end();
   }
 })
 
-server.listen(3001)
+server.listen(3001, () => {
+  console.log('server listen: http://localhost:3001');
+})

@@ -1,19 +1,8 @@
 ---
-title: 简化版 Vite
+title: http-server
 ---
 
-## 最小化实现
-
-在这个最小化的版本中，先不考虑最终的打包构建，也不考虑 cli 工具的实现，其核心的功能是：
-
-- 启动一个可用的开发服务
-- 正确响应请求的资源
-- 监听资源更新时，实现对资源的重载
-
-
-## 开发服务
-
-### http-server
+### http
 
 在 node 中，实现一个 开发服务 很简单，可以通过内置的 `http` 模块，实现一个 `http` 服务：
 
@@ -71,7 +60,7 @@ server.listen(3001);
 
 > 在 `vite` 的 `2.0` 版本之前，选择的是 `koa` 作为 `http-server`。 为什么从 `koa` 切换到 `connect`，原因我还未做深入了解。
 
-### Connect
+### connect
 
 使用 `connect` 启动一个 `http-server` 非常简单：
 
@@ -108,3 +97,5 @@ server.listen(3001)
 
 [查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/connect)
 
+但这个 `web-http-server` 还不能作为一个 前端的开发服务，它目前只能响应 `template` 目录中的资源，也没有对
+资源地址进行校验，判断资源是否存在等一系列缺陷。

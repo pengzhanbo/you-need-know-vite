@@ -5,8 +5,8 @@
   "author": "pengzhanbo",
   "license": "MIT",
   "scripts": {
-    "docs:dev": "pnpm --filter=docs run dev",
-    "docs:build": "pnpm --filter=docs run build"
+    "dev": "pnpm --filter=docs run dev",
+    "build": "pnpm --filter=docs run build"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^13.2.4",
@@ -26,7 +26,7 @@
     "prettier": "^2.8.4",
     "prettier-plugin-tailwindcss": "^0.2.4",
     "tailwindcss": "^3.2.7",
-    "ts-node": "^10.9.1",
+    "tsx": "^3.12.5",
     "typescript": "^4.9.5"
   }
 }

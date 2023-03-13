@@ -25,7 +25,7 @@ const config: DocsThemeConfig = {
   // chat: {
   //   link: 'https://discord.com',
   // },
-  docsRepositoryBase: 'https://github.com/pengzhanbo/you-need-know-vite',
+  docsRepositoryBase: 'https://github.com/pengzhanbo/you-need-know-vite/tree/main/docs',
   darkMode: true,
   primaryHue: 210,
   search: {

@@ -2,7 +2,7 @@
   "name": "example-connect",
   "type": "module",
   "scripts": {
-    "start": "ts-node-esm index.ts"
+    "start": "tsx index.ts"
   },
   "dependencies": {
     "connect": "^3.7.0"
