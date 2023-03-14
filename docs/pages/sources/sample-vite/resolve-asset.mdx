@@ -2,7 +2,7 @@
 title: 资源响应
 ---
 
-> 在本节中，仅实现加载 html、css、js 类型的资源，且暂不考虑 `import` 语句导入的模块。
+> 在本节中，仅实现加载 html、css、js 类型的资源。
 >
 > 在本节中， 使用 `@module/` 为前缀的资源地址，表示是第三方模块包，需要从 `node_modules` 中解析加载。
 
@@ -89,7 +89,7 @@ if (id.startsWith('/@module')) {
       id = typeof subExports === 'string' ? subExports : subExports['default']['default']
     }
   }
-  id = path.join('.', 'node_modules', packageName, id)
+  id = path.join('node_modules', packageName, id)
 }
 
 ```
@@ -98,6 +98,34 @@ if (id.startsWith('/@module')) {
 
 > 本节不完全实现 `exports` 的协议，仅针对 `axios`。
 >
-> 实际在 `vite` 中使用 [resolve.exports](https://github.com/lukeed/resolve.exports) 实现对 `exports` 的解析。
+> 在 `vite` 中使用 [resolve.exports](https://github.com/lukeed/resolve.exports) 实现对 `exports` 的解析。
 
+
+## 响应头
+
+虽然已经成功解析了 html 文件中 `@module` 导入的资源路径， 可以通过该路径加载资源文件并返回：
+```ts
+const assert = path.join(dirname, id);
+if (fs.existsSync(assert)) {
+  const stream = fs.createReadStream(assert);
+  stream.pipe(res);
+} else {
+  res.end();
+}
+```
+
+但是浏览器会给出错误信息：
+```
+Failed to load module script: 
+Expected a JavaScript module script but the server responded with a MIME type of "". 
+Strict MIME type checking is enforced for module scripts per HTML spec.
+```
+
+这是由于浏览器无法识别 `@module/axios` 资源的 `mime-type`。浏览器会根据文件名后缀判断资源类型，比如 `main.js` 被识别为 `application/javascript` 。 但显然 `@module/axios` 无法被识别，为了让浏览器能够正确识别，我们需要在响应头中，添加 `content-type` :
+
+```ts
+if (id.endsWith('.js')) {
+  res.setHeader('Content-Type', 'application/javascript')
+}
+```
 

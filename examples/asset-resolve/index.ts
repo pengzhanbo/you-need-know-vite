@@ -31,11 +31,11 @@ server.use(async (req, res) => {
     id = path.join('.', 'template', id)
   }
   const assert = path.join(dirname, id);
+  if (id.endsWith('.js')) {
+    res.setHeader('Content-Type', 'application/javascript')
+  }
   if (fs.existsSync(assert)) {
     const stream = fs.createReadStream(assert);
-    if (id.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript')
-    }
     stream.pipe(res);
   } else {
     res.end();
