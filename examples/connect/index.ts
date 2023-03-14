@@ -1,5 +1,5 @@
 import connect from "connect";
-import fs, { promises as fsp } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,8 +12,6 @@ server.use(async (req, res) => {
   const assert = path.join(dirname, `./template/${url}`);
   if (fs.existsSync(assert)) {
     const stream = fs.createReadStream(assert);
-    const stats = await fsp.lstat(assert);
-    res.setHeader("Content-Length", stats.size);
     stream.pipe(res);
   } else {
     res.end();

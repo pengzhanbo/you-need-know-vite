@@ -2,7 +2,102 @@
 title: 资源响应
 ---
 
+> 在本节中，仅实现加载 html、css、js 类型的资源，且暂不考虑 `import` 语句导入的模块。
+>
+> 在本节中， 使用 `@module/` 为前缀的资源地址，表示是第三方模块包，需要从 `node_modules` 中解析加载。
+
 在一个 前端的工程化项目中， 资源包括了 项目中的 源文件、 通过如 `npm/yarn/pnpm` 等包管理工具下载安装的
 第三方模块包。
 
+如，在一个项目中，有如下资源内容：
+
+```sh
+.
+├── node_modules
+│   └── axios
+├── index.html
+├── index.css
+└── main.js
+```
+
+
+其中 `index.html` 内容如下：
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <script type="module" src="@module/axios"></script>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
+```
+
+使用 [开发服务](/sources/sample-vite/http-server) 可以正确加载 `index.css`和`main.js` ，但是 `@module/axios` 时，却遇到了问题， `@module/axios` 不是一个标准的资源路径，当前的 **开发服务** 不能正确读取到该资源，
+对浏览器来说，也无法判断该资源的类型。
+
+### 路径解析
+
+`@module/` 表示一个位于 `node_modules` 中的包，`axios` 则是包名，在`axios`包中，我们可以查看到 `package.json`中的配置：
+```json
+{
+  "name": "axios",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "types": {
+        "require": "./index.d.cts",
+        "default": "./index.d.ts"
+      },
+      "browser": {
+        "require": "./dist/browser/axios.cjs",
+        "default": "./index.js"
+      },
+      "default": {
+        "require": "./dist/node/axios.cjs",
+        "default": "./index.js"
+      }
+    },
+  },
+  "type": "module",
+  // ...
+}
+```
+
+在 `nodejs` 的标准中， 在`package.json` 中通过 `main` 或 `exports` 定义包的入口地址。
+[查看官方文档 main-entry-point-export](https://nodejs.org/dist/latest-v19.x/docs/api/packages.html#main-entry-point-export) : 
+
+所以我们可以通过 `axios/package.json` 获取 `axios` 的 入口文件路径：
+
+```ts
+let id = req.url === '/' ? '/index.html' : req.url
+if (id.startsWith('/@module')) {
+  const [,,packageName, pathname = '.'] = id.split('/')
+  let pkg = {} as any
+  try {
+    pkg = JSON.parse(await fsp.readFile(path.join(dirname, 'node_modules', packageName, 'package.json'),'utf-8'))
+  } catch { /* empty */ }
+  if (!pkg.exports && pkg.main) {
+    id = pkg.main
+  } else if (pkg.exports) {
+    if (typeof pkg.exports === 'string') {
+      id = pkg.exports
+    } else {
+      const subExports = pkg.exports[pathname]
+      id = typeof subExports === 'string' ? subExports : subExports['default']['default']
+    }
+  }
+  id = path.join('.', 'node_modules', packageName, id)
+}
+
+```
+
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/asset-resolve)
+
+> 本节不完全实现 `exports` 的协议，仅针对 `axios`。
 >
+> 实际在 `vite` 中使用 [resolve.exports](https://github.com/lukeed/resolve.exports) 实现对 `exports` 的解析。
+
+
