@@ -71,6 +71,17 @@ importers:
       postcss: 8.4.21
       tailwindcss: 3.2.7_postcss@8.4.21
 
+  examples/asset-path-resolve:
+    specifiers:
+      '@types/connect': ^3.4.35
+      connect: ^3.7.0
+      js-cookie: ^3.0.1
+    dependencies:
+      connect: 3.7.0
+      js-cookie: 3.0.1
+    devDependencies:
+      '@types/connect': 3.4.35
+
   examples/asset-resolve:
     specifiers:
       '@types/connect': ^3.4.35
@@ -2670,6 +2681,11 @@ packages:
 
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
+
+  /js-cookie/3.0.1:
+    resolution: {integrity: sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==}
+    engines: {node: '>=12'}
+    dev: false
 
   /js-sdsl/4.3.0:
     resolution: {integrity: sha512-mifzlm2+5nZ+lEcLJMoBK0/IH/bDg8XnJfd/Wq6IP+xoCjLZsTOnV2QpxlVbX9bMnkl5PdEjNtBJ9Cj1NjifhQ==}

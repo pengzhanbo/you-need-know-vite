@@ -1,5 +1,6 @@
 {
   "index": "功能说明",
   "http-server": "开发服务",
-  "resolve-asset": "资源响应"
+  "resolve-asset": "资源响应",
+  "live-reload": "自动重载"
 }

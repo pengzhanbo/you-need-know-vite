@@ -14,7 +14,7 @@ title: 资源响应
 ```sh
 .
 ├── node_modules
-│   └── axios
+│   └── js-cookie
 ├── index.html
 ├── index.css
 └── main.js
@@ -29,47 +29,34 @@ title: 资源响应
   <link rel="stylesheet" href="/index.css">
 </head>
 <body>
-  <script type="module" src="@module/axios"></script>
+  <script type="module" src="@module/js-cookie"></script>
   <script type="module" src="/main.js"></script>
 </body>
 </html>
 ```
 
-使用 [开发服务](/sources/sample-vite/http-server) 可以正确加载 `index.css`和`main.js` ，但是 `@module/axios` 时，却遇到了问题， `@module/axios` 不是一个标准的资源路径，当前的 **开发服务** 不能正确读取到该资源，
+使用 [开发服务](/sources/sample-vite/http-server) 可以正确加载 `index.css`和`main.js` ，但是 `@module/js-cookie` 时，却遇到了问题， `@module/js-cookie` 不是一个标准的资源路径，当前的 **开发服务** 不能正确读取到该资源，
 对浏览器来说，也无法判断该资源的类型。
 
 ### 路径解析
 
-`@module/` 表示一个位于 `node_modules` 中的包，`axios` 则是包名，在`axios`包中，我们可以查看到 `package.json`中的配置：
+`@module/` 表示一个位于 `node_modules` 中的包，`js-cookie` 则是包名，在`js-cookie`包中，我们可以查看到 `package.json`中的配置：
 ```json
-{
-  "name": "axios",
-  "main": "index.js",
+ "name": "js-cookie",
+  "module": "dist/js.cookie.mjs",
   "exports": {
     ".": {
-      "types": {
-        "require": "./index.d.cts",
-        "default": "./index.d.ts"
-      },
-      "browser": {
-        "require": "./dist/browser/axios.cjs",
-        "default": "./index.js"
-      },
-      "default": {
-        "require": "./dist/node/axios.cjs",
-        "default": "./index.js"
-      }
+      "import": "./dist/js.cookie.mjs",
+      "require": "./dist/js.cookie.js"
     },
+    "./package.json": "./package.json"
   },
-  "type": "module",
-  // ...
-}
 ```
 
 在 `nodejs` 的标准中， 在`package.json` 中通过 `main` 或 `exports` 定义包的入口地址。
 [查看官方文档 main-entry-point-export](https://nodejs.org/dist/latest-v19.x/docs/api/packages.html#main-entry-point-export) : 
 
-所以我们可以通过 `axios/package.json` 获取 `axios` 的 入口文件路径：
+所以我们可以通过 `js-cookie/package.json` 获取 `js-cookie` 的 入口文件路径：
 
 ```ts
 let id = req.url === '/' ? '/index.html' : req.url
@@ -86,7 +73,7 @@ if (id.startsWith('/@module')) {
       id = pkg.exports
     } else {
       const subExports = pkg.exports[pathname]
-      id = typeof subExports === 'string' ? subExports : subExports['default']['default']
+      id = typeof subExports === 'string' ? subExports : subExports['import']
     }
   }
   id = path.join('node_modules', packageName, id)
@@ -94,14 +81,14 @@ if (id.startsWith('/@module')) {
 
 ```
 
-[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/asset-resolve)
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/asset-path-resolve)
 
-> 本节不完全实现 `exports` 的协议，仅针对 `axios`。
+> 本节不完全实现 `exports` 的协议，仅针对 `js-cookie`。
 >
 > 在 `vite` 中使用 [resolve.exports](https://github.com/lukeed/resolve.exports) 实现对 `exports` 的解析。
 
 
-## 响应头
+### 响应头
 
 虽然已经成功解析了 html 文件中 `@module` 导入的资源路径， 可以通过该路径加载资源文件并返回：
 ```ts
@@ -121,13 +108,13 @@ Expected a JavaScript module script but the server responded with a MIME type of
 Strict MIME type checking is enforced for module scripts per HTML spec.
 ```
 
-这是由于浏览器无法识别 `@module/axios` 资源的 `mime-type`。浏览器会根据文件名后缀判断资源类型，比如 `main.js` 被识别为 `application/javascript` 。 但显然 `@module/axios` 无法被识别，为了让浏览器能够正确识别，我们需要在响应头中，添加 `content-type` :
+这是由于浏览器无法识别 `@module/js-cookie` 资源的 `mime-type`。浏览器会根据文件名后缀判断资源类型，比如 `main.js` 被识别为 `application/javascript` 。 但显然 `@module/js-cookie` 无法被识别，为了让浏览器能够正确识别，我们需要在响应头中，添加 `content-type` :
 
 ```ts
 if (id.endsWith('.js')) {
   res.setHeader('Content-Type', 'application/javascript')
 }
 ```
-[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/asset-resolve)
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/asset-path-resolve)
 
 此时，浏览器可以正确读取并识别资源类型。接下来，则是实现 资源更新重载。
