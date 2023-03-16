@@ -2,3 +2,87 @@
 title: 自动重载
 ---
 
+在一个 前端的工程化项目中， 资源发生变更，期望浏览器端也能响应变更，更新内容。
+
+一般来说，当资源发生变更时，可以通过浏览器页面刷新来更新资源，这被称为 `live reload`，
+还有一种无刷新的技术方案，即 `HMR` 即 `Hot Module Replacement （热模块替换）`，仅更新发生变更资源的部分，
+而无需刷新浏览器。
+
+> 在本节中，我们仅讨论 `live reload` 的实现，暂不考虑`HMR`。
+
+### 文件监听
+
+要实现 `live reload`，首先需要知道文件发生了变更。
+
+在 `nodejs` 中，我们可以通过 `fs` 模块的 `fs.watch` 或 `fs.watchFile` 实现对目录或者文件进行监听。
+
+```ts
+import fs from 'node:fs'
+
+fs.watch('src', (eventType, filename) => {
+  console.log(`event type is: ${eventType}`);
+});
+
+fs.watchFile('main.js', (curr, prev) => {
+  console.log(`current file Stat: ${curr}`);
+});
+```
+
+但是 `fs.watch` 和 `fs.watchFile` 在不同的系统表现不一定符合预期期望，得益于 `nodejs` 强大的开源社区，
+我们可以使用 开源库 [chokidar](https://www.npmjs.com/package/chokidar) 监听文件变更。
+
+```ts
+import chokidar from 'chokidar'
+
+const watcher = chokidar.watch(['src/**/*'])
+
+// 文件发生变更
+watcher.on('change', (filepath) => {
+  console.log('change: ', filepath)
+})
+// 新增文件
+watcher.on('add', (filepath) => {
+  console.log('add: ', filepath)
+})
+// 文件删除
+watcher.on('unlink', (filepath) => {
+  console.log('unlink: ', filepath)
+})
+```
+
+在实现了文件监听后，就需要使浏览器获知文件变更，使浏览器刷新，重新请求新的资源内容。
+
+### 轮询
+
+我们可以在 `http-server` 中，实现一个接口，该接口用于返回服务器资源是否有发生变更：
+
+```ts
+const watcher = chokidar.watch(path.join(__dirname, 'src/**/*'))
+let hasUpdated = false
+
+const shouldUpdate = () => hasUpdated = true
+
+watcher.on('add', shouldUpdate)
+watcher.on('change', shouldUpdate)
+watcher.on('unlink', shouldUpdate)
+
+server.use('/live-reload', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.end(JSON.stringify({ hasUpdated }))
+  hasUpdated = false
+})
+```
+
+在 html 文件中，注入脚本， 每隔一段时间，询问服务器是否有资源发生变更，如果有发生变更，则刷新页面：
+```ts
+const timer = setInterval(async () => {
+  const res = await fetch('/live-reload')
+  const status = await res.json()
+  if (status.hasUpdated) {
+    clearInterval(timer)
+    location.reload()
+  }
+}, 300)
+```
+
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/live-reload-polling)
