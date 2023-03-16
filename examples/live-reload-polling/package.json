@@ -1,0 +1,12 @@
+{
+  "name": "example-live-reload-polling",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "connect": "^3.7.0",
+    "js-cookie": "^3.0.1"
+  }
+}
