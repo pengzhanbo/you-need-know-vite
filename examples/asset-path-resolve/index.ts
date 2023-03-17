@@ -2,7 +2,7 @@ import connect from 'connect';
 import fs, {promises as fsp} from 'node:fs';
 import path from 'node:path';
 
-const RE_IMPORTER = /(?:\s+from|import)\s+['"]([^'"]+?)['"]/g
+const RE_IMPORTER = /(?:\s+from|import)\s+['"]([^'"]+?)['"]/g;
 
 const server = connect();
 
