@@ -8,15 +8,15 @@ const server = connect();
 
 server.use(async (req, res, next) => {
   let id = req.url === '/' ? '/index.html' : req.url;
-  const isModule = id.startsWith('/@module')
-  let relativePath = ''
+  const isModule = id.startsWith('/@module');
+  let relativePath = '';
   if (isModule) {
     const { packageName, id: _id } = await resolveExports(id);
     id = path.join(process.cwd(), 'node_modules', packageName, _id);
     const subDir = path.dirname(_id);
-    relativePath = path.join('/@module', packageName, subDir)
+    relativePath = path.join('/@module', packageName, subDir);
   } else {
-    id = path.join(process.cwd(), 'template', id);
+    id = path.join(process.cwd(), 'src', id);
   }
   if (/\.[mc]?[tj]s$/.test(id)) {
     res.setHeader('Content-Type', 'application/javascript');
@@ -25,7 +25,7 @@ server.use(async (req, res, next) => {
     const content = await fsp.readFile(id, 'utf-8');
     res.end(rewriteImporters(content, relativePath));
   } else {
-    next()
+    next();
   }
 })
 
@@ -36,14 +36,14 @@ server.listen(3001, () => {
 
 function rewriteImporters(content: string, relativePath = '') {
   return content.replace(RE_IMPORTER, (match, filepath) => {
-    const starts = match.startsWith('import') ? 'import' : ' from'
+    const starts = match.startsWith('import') ? 'import' : ' from';
     if (filepath.startsWith('./') || filepath.startsWith('../') || filepath === '.') {
-      return `${starts} '${relativePath? path.join(relativePath, filepath) : filepath}'`
+      return `${starts} '${relativePath? path.join(relativePath, filepath) : filepath}'`;
     }
     if (filepath[0] !== '/') {
-      return `${starts} '/@module/${filepath}'`
+      return `${starts} '/@module/${filepath}'`;
     }
-    return match
+    return match;
   })
 }
 
@@ -64,9 +64,9 @@ async function resolveExports(id: string) {
       if (subExports) {
         id = typeof subExports === 'string' ? subExports : (subExports['import'] || subExports['browser']);
       } else {
-        id = pathname
+        id = pathname;
       }
     }
   }
-  return { packageName, id }
+  return { packageName, id };
 }

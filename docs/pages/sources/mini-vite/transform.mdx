@@ -5,3 +5,32 @@ title: 资源转换
 在一个前端工程中，我们也常常会使用到如 `typescript`编写代码， 或 使用`postcss`/`less`/`sass` 编写css 代码。
 但是在浏览器中，是不支持这些格式的，因此我们还需要将 `typescript` 转为 `javascript`， 将 `postcss`/`less`/`sass` 转为 `css` 代码。
 
+在这一小节中，我们将使用 `esbuild` 将 `typescript` 代码编译为 浏览器支持的`javascript`代码， 再响应给浏览器。
+
+## esbuild
+
+[esbuild](https://esbuild.github.io/) 是一个高性能的 web 编译工具。我们可以用它非常轻松的将 `typescript` 代码编译为 浏览器支持的`javascript`代码。
+
+```ts
+import { transform } from 'esbuild'
+// ...
+server.use((req, res) => {
+  // ...
+  if (/\.[mc]?ts/.test(id)) {
+    content = await transformWithEsbuild(content)
+  }
+  // ...
+})
+// ...
+async function transformWithEsbuild(code: string) {
+  const result = await transform(code, {
+    target: 'esnext',
+    charset: 'utf8',
+    platform: 'browser',
+    format: 'esm',
+    loader: 'js',
+  })
+  return result.code
+}
+```
+[查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/esbuild-transform)

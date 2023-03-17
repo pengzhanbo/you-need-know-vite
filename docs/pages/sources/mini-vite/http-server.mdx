@@ -21,30 +21,19 @@ server.listen(3000);
 
 ```ts
 import { createServer } from "node:http";
-import fs, { promises as fsp } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const server = createServer(async (req, res) => {
-  /**
-   * 获取 `html` 在本地磁盘的路径地址，通过 `fs` 读取
-   */
-  const index = path.join(dirname, "./template/index.html");
-  /**
-   * 创建文件读取流
-   */
+  const index = path.join(process.cwd(), 'src/index.html');
   const stream = fs.createReadStream(index);
-  const stats = await fsp.lstat(index);
-  /**
-   * 发送资源内容
-   */
-  res.setHeader("Content-Length", stats.size);
   stream.pipe(res);
 });
 
-server.listen(3001);
+server.listen(3001, () => {
+  console.log('server listen: http://localhost:3001');
+});
 
 ```
 
@@ -76,26 +65,29 @@ server.listen(3000)
 
 ```ts
 import connect from "connect";
-import fs, { promises as fsp } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const server = connect()
+const server = connect();
 
 server.use(async (req, res) => {
   const url = req.url === '/' ? '/index.html' : req.url
-  const assert = path.join(dirname, `./template/${url}`);
-  const stream = fs.createReadStream(assert);
-  stream.pipe(res);
+  const assert = path.join(process.cwd(), 'src', url);
+  if (fs.existsSync(assert)) {
+    const stream = fs.createReadStream(assert);
+    stream.pipe(res);
+  } else {
+    res.end();
+  }
 })
 
-server.listen(3001)
+server.listen(3001, () => {
+  console.log('server listen: http://localhost:3001');
+})
 
 ```
 
 [查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/connect)
 
-但这个 `web-http-server` 还不能作为一个 前端的开发服务，它目前只能响应 `template` 目录中的资源，也没有对
+但这个 `web-http-server` 还不能作为一个 前端的开发服务，它目前只能响应 `src` 目录中的资源，也没有对
 资源地址进行校验，判断资源是否存在等一系列缺陷。

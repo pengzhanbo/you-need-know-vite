@@ -98,12 +98,12 @@ module.exports = {
         // TODO: fix errors
         // 'plugin:@typescript-eslint/recommended-requiring-type-checking'
       ],
-      parserOptions: {
-        project: [
-          "examples/*/tsconfig.json",
-          "docs/tsconfig.json",
-        ],
-      },
+      // parserOptions: {
+      //   project: [
+      //     "examples/*/tsconfig.json",
+      //     "docs/tsconfig.json",
+      //   ],
+      // },
       rules: {
         "@typescript-eslint/no-unnecessary-type-assertion": "error",
         "@typescript-eslint/consistent-type-imports": "error",

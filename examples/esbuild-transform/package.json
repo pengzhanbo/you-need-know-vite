@@ -1,0 +1,14 @@
+{
+  "name": "example-esbuild-transform",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "connect": "^3.7.0"
+  },
+  "devDependencies": {
+    "@types/connect": "^3.4.35",
+    "esbuild": "^0.17.12"
+  }
+}
