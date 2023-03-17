@@ -35,7 +35,7 @@ title: 资源响应
 </html>
 ```
 
-使用 [开发服务](/sources/sample-vite/http-server) 可以正确加载 `index.css`和`main.js` ，但是 `@module/js-cookie` 时，却遇到了问题， `@module/js-cookie` 不是一个标准的资源路径，当前的 **开发服务** 不能正确读取到该资源，
+使用 [开发服务](/sources/mini-vite/http-server) 可以正确加载 `index.css`和`main.js` ，但是 `@module/js-cookie` 时，却遇到了问题， `@module/js-cookie` 不是一个标准的资源路径，当前的 **开发服务** 不能正确读取到该资源，
 对浏览器来说，也无法判断该资源的类型。
 
 ## 路径解析
