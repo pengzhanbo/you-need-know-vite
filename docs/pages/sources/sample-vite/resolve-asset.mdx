@@ -38,7 +38,54 @@ title: 资源响应
 使用 [开发服务](/sources/sample-vite/http-server) 可以正确加载 `index.css`和`main.js` ，但是 `@module/js-cookie` 时，却遇到了问题， `@module/js-cookie` 不是一个标准的资源路径，当前的 **开发服务** 不能正确读取到该资源，
 对浏览器来说，也无法判断该资源的类型。
 
-### 路径解析
+## 路径解析
+
+### import 语句
+
+在一个 `ES Module` 的 脚本文件中，我们通常会使用 `import` 语句导入其他的模块，导入文件可能是 第三方模块包，也可能是一个相对路径或绝对路径：
+```ts
+import axios from 'axios'
+import mod1 from './mod1.js'
+import mod2 from '/mod2.js'
+```
+
+这些路径对于服务器，可能并不能直接正确响应到资源，因此在服务器端，我们需要对这些路径进行转换。
+比如， `import axios from 'axios'` 应转换为 `import axios from '@module/axios'`。
+通过 `@module` 告知服务器响应该资源时，应该从一个 第三方模块 中解析资源。
+
+因此，我们首先需要先读取到对应资源的内容，查找内容中的 `import` 语句，并对其进行处理：
+
+```ts
+const RE_IMPORTER = /(?:\s+from|import)\s+['"]([^'"]+?)['"]/g
+
+app.use((req, res) => {
+  // ...
+  const content = await fsp.readFile(id, 'utf-8');
+  res.end(rewriteImporters(content, relativePath));
+  // ...
+})
+
+function rewriteImporters(content: string, relativePath = '') {
+  return content.replace(RE_IMPORTER, (match, filepath) => {
+    const starts = match.startsWith('import') ? 'import' : ' from'
+    /**
+     * 以 './' '../'开口，或 '.' 的相对路径，需要根据根据当前资源的路径转换
+     */
+    if (filepath.startsWith('./') || filepath.startsWith('../') || filepath === '.') {
+      return `${starts} '${relativePath? path.join(relativePath, filepath) : filepath}'`
+    }
+    /**
+     * 非相对路径和绝对路径，表示这是一个第三方模块包
+     */
+    if (filepath[0] !== '/') {
+      return `${starts} '/@module/${filepath}'`
+    }
+    return match
+  })
+}
+```
+
+### node_modules
 
 `@module/` 表示一个位于 `node_modules` 中的包，`js-cookie` 则是包名，在`js-cookie`包中，我们可以查看到 `package.json`中的配置：
 ```json
@@ -59,24 +106,28 @@ title: 资源响应
 所以我们可以通过 `js-cookie/package.json` 获取 `js-cookie` 的 入口文件路径：
 
 ```ts
-let id = req.url === '/' ? '/index.html' : req.url
-if (id.startsWith('/@module')) {
-  const [,,packageName, pathname = '.'] = id.split('/')
-  let pkg = {} as any
+async function resolveExports(id: string) {
+  const [,,packageName, ...other] = id.split('/');
+  const pathname = other.join('/') || '.';
+  let pkg = {} as any;
   try {
-    pkg = JSON.parse(await fsp.readFile(path.join(dirname, 'node_modules', packageName, 'package.json'),'utf-8'))
+    pkg = JSON.parse(await fsp.readFile(path.join(process.cwd(), 'node_modules', packageName, 'package.json'),'utf-8'));
   } catch { /* empty */ }
   if (!pkg.exports && pkg.main) {
-    id = pkg.main
+    id = pathname === '.' ? pkg.main : pathname;
   } else if (pkg.exports) {
     if (typeof pkg.exports === 'string') {
-      id = pkg.exports
+      id = pathname === '.' ? pkg.exports : pathname;
     } else {
-      const subExports = pkg.exports[pathname]
-      id = typeof subExports === 'string' ? subExports : subExports['import']
+      const subExports = pkg.exports[pathname];
+      if (subExports) {
+        id = typeof subExports === 'string' ? subExports : subExports['import'];
+      } else {
+        id = pathname
+      }
     }
   }
-  id = path.join('node_modules', packageName, id)
+  return { packageName, id }
 }
 
 ```
@@ -87,19 +138,34 @@ if (id.startsWith('/@module')) {
 >
 > 在 `vite` 中使用 [resolve.exports](https://github.com/lukeed/resolve.exports) 实现对 `exports` 的解析。
 
+成功获取到 第三方模块的真实路径后，则继续读取该资源内容，并响应给浏览器：
 
-### 响应头
-
-虽然已经成功解析了 html 文件中 `@module` 导入的资源路径， 可以通过该路径加载资源文件并返回：
 ```ts
-const assert = path.join(dirname, id);
-if (fs.existsSync(assert)) {
-  const stream = fs.createReadStream(assert);
-  stream.pipe(res);
-} else {
-  res.end();
-}
+server.use(async (req, res, next) => {
+  let id = req.url === '/' ? '/index.html' : req.url;
+  const isModule = id.startsWith('/@module')
+  let relativePath = ''
+  if (isModule) {
+    const { packageName, id: _id } = await resolveExports(id);
+    id = path.join(process.cwd(), 'node_modules', packageName, _id);
+    const subDir = path.dirname(_id);
+    relativePath = path.join('/@module', packageName, subDir)
+  } else {
+    id = path.join(process.cwd(), 'template', id);
+  }
+  if (fs.existsSync(id)) {
+    const content = await fsp.readFile(id, 'utf-8');
+    res.end(rewriteImporters(content, relativePath));
+  } else {
+    next()
+  }
+})
 ```
+
+
+## 响应头
+
+虽然已经成功解析了 html 文件中 `@module` 导入的资源路径， 可以通过该路径加载资源文件并返回。
 
 但是浏览器会给出错误信息：
 ```
@@ -111,9 +177,9 @@ Strict MIME type checking is enforced for module scripts per HTML spec.
 这是由于浏览器无法识别 `@module/js-cookie` 资源的 `mime-type`。浏览器会根据文件名后缀判断资源类型，比如 `main.js` 被识别为 `application/javascript` 。 但显然 `@module/js-cookie` 无法被识别，为了让浏览器能够正确识别，我们需要在响应头中，添加 `content-type` :
 
 ```ts
-if (id.endsWith('.js')) {
-  res.setHeader('Content-Type', 'application/javascript')
-}
+if (/\.[mc]?[tj]s$/.test(id)) {
+    res.setHeader('Content-Type', 'application/javascript');
+  }
 ```
 [查看完整示例](https://github.com/pengzhanbo/you-need-know-vite/tree/main/examples/asset-path-resolve)
 
