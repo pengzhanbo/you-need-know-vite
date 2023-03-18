@@ -9,20 +9,15 @@ import Mermaid from '@components/Mermaid'
 
 <Mermaid chart={`
 flowchart TD
-  CS(create server) --> M[middlewares]
-  RC(resolve config) --> CS
-  M --> HS[http server]
-  CS --> WS[ws]
-  CS --> FW[watcher]
-  CS --> MG[module graph]
-  MG --> PC
-  FW --> PC[plugin container]
-  WS ----> S([vite dev server])
-  M ---> S
-  HS ---> S
-  MG ---> S
-  PC ---> S
-  FW ---> S
+  CS(create server) ---> RC(resolve config) & M(middlewares)
+  CS ---> WS(websocket) & MG(module graph) & FW(watcher)
+  RC ----> HS & PC
+  M ----> HS(http server)
+  FW & MG --> PC(plugin container)
+  MG & FW & WS ----> H(HMR)
+  M & MG & WS & PC & FW --> S(vite dev server)
+  HS & H ---> S
+  RC --> S
 `}
 />
 
