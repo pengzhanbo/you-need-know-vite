@@ -5,20 +5,28 @@ title: 开始之前
 ## 写在前面
 
 [vite](https://vitejs.dev/) 作为一个现阶段非常流行的前端工具，拥有着极快的启动速度、热更新速度，
-同时，还兼容 `rollup` 的插件机制、内置对 `typescript` 的支持。它极大的提高了前段开发的效率，带来了优秀的开发体验。
+同时，还兼容 `rollup` 的插件机制、内置对 `typescript` 的支持。它极大的提高了前端开发的效率，带来了优秀的开发体验。
 
 深入学习 `vite` 的源码，这有助于我们更好的了解，以及运用 `vite` 。
 
 ## 计划
 
-为了便于由浅入深，文档不会完全按照 `vite` 仓库中的源码，进行逐行说明，文档将从 如何实现一个最简单版本的 `vite` 开始，通过逐步添加、实现相关功能的方式，开展对 源码的解析。
+为了便于由浅入深，文档不会完全按照 `vite` 仓库中的源码，进行逐行说明，文档将从 如何实现一个最简单版本的 `vite`，用于初步了解 工具如何启动一个开发服务。并以此作为基础，从 `vite` 的 `createServer` 开始，逐步深入。
 
-在这个过程中，将分为以下步骤：
+将分为以下内容：
 
-- [ ] 实现简单版本的 `vite`
-- [ ] 资源转换  
-- [ ] 热更新
-- [ ] 插件机制
-- [ ] 打包构建
+- [x] 实现简单版本的 `vite`
+- [ ] resolve Config
+- [ ] createServer
+- [ ] http Server
+- [ ] ws
+- [ ] File Watcher
+- [ ] Module Graph
+- [ ] Plugin Container
+- [ ] Hot Module Replacement
+- [ ] Build
+- [ ] Optimizer
+- [ ] SSR
+- [ ] cli
 
 todo...
