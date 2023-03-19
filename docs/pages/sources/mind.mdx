@@ -26,9 +26,10 @@ flowchart TD
 
 <Mermaid chart={`
 flowchart TD
+  subgraph build
   RC(resolve config) --> RS
   RS(resolve rollup option) --> R[rollup bundler]
-
+  end
 `}
 />
 
@@ -36,7 +37,8 @@ flowchart TD
 
 <Mermaid chart={`
 flowchart TD
+  subgraph preview
   RC(resolve config) --> HS(http server)
-
+  end
 `}
 />
