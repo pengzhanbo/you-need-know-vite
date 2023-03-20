@@ -7,7 +7,6 @@ let uuid = 0
 export default function Mermaid({ chart, theme = 'default' }: MermaidProps) {
   const [svg, setSVG] = useState('')
   const { theme: themeMode } = useTheme()
-
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: true,
@@ -19,7 +18,6 @@ export default function Mermaid({ chart, theme = 'default' }: MermaidProps) {
     ).then(({svg}) => setSVG(svg))
     uuid++
   }, [chart, theme, themeMode])
-
   return <div
     className='flex justify-center pt-5'
     dangerouslySetInnerHTML={{ __html: svg }}
