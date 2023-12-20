@@ -8,6 +8,6 @@
     "connect": "^3.7.0"
   },
   "devDependencies": {
-    "@types/connect": "^3.4.35"
+    "@types/connect": "^3.4.38"
   }
 }
